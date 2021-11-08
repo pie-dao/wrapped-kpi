@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import {ERC20Upgradeable as ERC20} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {IERC20Upgradeable as IERC20} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {SafeERC20Upgradeable as SafeERC20} from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import {OwnableUpgradeable as Ownable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {ERC20Upgradeable as ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20Upgradeable.sol";
+import {IERC20Upgradeable as IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20Upgradeable.sol";
+import {SafeERC20Upgradeable as SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import {OwnableUpgradeable as Ownable} from "@openzeppelin/contracts/access/OwnableUpgradeable.sol";
 
-import {ILSPair} from "../interfaces/ILSPairUpgradeable.sol";
-import {ISharesTimeLock} from "../interfaces/ISharesTimeLockUpgradeable.sol";
+import {ILSPair} from "../interfaces/ILSPair.sol";
+import {ISharesTimeLock} from "../interfaces/ISharesTimeLock.sol";
 
 contract wLSPair is ERC20, Ownable {
     using SafeERC20 for IERC20;
@@ -29,7 +29,7 @@ contract wLSPair is ERC20, Ownable {
 
     /// @dev Prevents implementation initialization.
     constructor() {
-        _lsPair = address(1);
+        longToken = address(1);
     }
 
     /// @notice Initialize the contract.
@@ -39,7 +39,10 @@ contract wLSPair is ERC20, Ownable {
         external
         initializer
     {
-        if (_lsPair == address(1)) return;
+        if (longToken == address(1)) return;
+
+        require(_lsPair != address(0), "ZERO_ADDR");
+        require(_timeLock != address(0), "ZERO_ADDR");
 
         __Ownable_init();
         __ERC20_init("Wrapped PieDAO staked DOUGH KPI Option", "wDOUGH-KPI");
@@ -50,7 +53,6 @@ contract wLSPair is ERC20, Ownable {
         longToken = lsPair.longToken();
         collateral = lsPair.collateralToken();
 
-        IERC20(longToken).safeApprove(_lsPair, type(uint256).max);
         IERC20(collateral).safeApprove(_timeLock, type(uint256).max);
     }
 
@@ -58,7 +60,7 @@ contract wLSPair is ERC20, Ownable {
     /// @dev Caller needs to approve the spending of `amount` longTokens 
     /// @param amount amount to mint
     function mint(uint256 amount) external onlyOwner {
-        longToken.safeTransferFrom(msg.sender, address(this), amount);
+        IERC20(longToken).safeTransferFrom(msg.sender, address(this), amount);
         _mint(msg.sender, amount);
     }
 
