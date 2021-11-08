@@ -10,7 +10,7 @@ def setup():
 
 def main():
     # need to create 'piedao-deployer' account to be able to deploy
-    # setup()
+    setup()
 
     account = accounts.load('piedao-deployer') 
     pproxy = PProxy.deploy({'from': account})

@@ -2,6 +2,28 @@
 pragma solidity ^0.8.0;
 
 interface ILSPair {
+    event TokensCreated(
+        address indexed sponsor,
+        uint256 indexed collateralUsed,
+        uint256 indexed tokensMinted
+    );
+    event TokensRedeemed(
+        address indexed sponsor,
+        uint256 indexed collateralReturned,
+        uint256 indexed tokensRedeemed
+    );
+    event ContractExpired(address indexed caller);
+    event EarlyExpirationRequested(
+        address indexed caller,
+        uint64 earlyExpirationTimeStamp
+    );
+    event PositionSettled(
+        address indexed sponsor,
+        uint256 collateralReturned,
+        uint256 longTokens,
+        uint256 shortTokens
+    );
+
     /**
      * @notice Settle long and/or short tokens in for collateral at a rate informed by the contract settlement.
      * @dev Uses financialProductLibrary to compute the redemption rate between long and short tokens.
@@ -38,10 +60,10 @@ interface ILSPair {
      */
     function expire() external;
 
-    /** 
-    * @notice Amount of collateral a pair of tokens is always redeemable for.
-    */ 
-    function collateralPerPair() external view returns(uint256);
+    /**
+     * @notice Amount of collateral a pair of tokens is always redeemable for.
+     */
+    function collateralPerPair() external view returns (uint256);
 
     /**
      * @notice Collateral token used to back LSP synthetics.
