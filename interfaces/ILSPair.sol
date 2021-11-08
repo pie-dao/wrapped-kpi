@@ -18,9 +18,33 @@ interface ILSPair {
         external
         returns (uint256 collateralReturned);
 
+    /**
+     * @notice Create tokens
+     */
+    function create(uint256 tokensToCreate) external;
+
+    /**
+     * @notice Pair name.
+     */
+    function pairName() external view returns (string memory);
+
+    /**
+     * @notice Token used as long in the LSP. Mint and burn rights needed by this contract.
+     */
     function longToken() external view returns (address);
 
-    function shortToken() external view returns (address);
+    /**
+     * @notice Expire the LS Pair
+     */
+    function expire() external;
 
+    /** 
+    * @notice Amount of collateral a pair of tokens is always redeemable for.
+    */ 
+    function collateralPerPair() external view returns(uint256);
+
+    /**
+     * @notice Collateral token used to back LSP synthetics.
+     */
     function collateralToken() external view returns (address);
 }
