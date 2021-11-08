@@ -27,11 +27,14 @@ contract wLSPair is ERC20, Ownable {
         uint8 indexed months
     );
 
-    // Prevents implementation initialization
+    /// @dev Prevents implementation initialization.
     constructor() {
         _lsPair = address(1);
     }
 
+    /// @notice Initialize the contract.
+    /// @param _lsPair UMA LongShortPair
+    /// @param _timeLock The veDOUGH timelock
     function initialize(address _lsPair, address _timeLock)
         external
         initializer
@@ -51,11 +54,18 @@ contract wLSPair is ERC20, Ownable {
         IERC20(collateral).safeApprove(_timeLock, type(uint256).max);
     }
 
+    /// @notice Mints `amount` of wDOUGH-KPI
+    /// @dev Caller needs to approve the spending of `amount` longTokens 
+    /// @param amount amount to mint
     function mint(uint256 amount) external onlyOwner {
         longToken.safeTransferFrom(msg.sender, address(this), amount);
         _mint(msg.sender, amount);
     }
 
+    /// @notice Settles the KPI and stakes on behalf of the user.
+    /// @dev This contract should be whitelisted on the Timelock side
+    /// @param amount amount of wDOUGH-KPI to burn
+    /// @param months amount of months the DOUGH will be staked
     function settleAndStake(uint256 amount, uint8 months) external {
         require(
             months >= MIN_MONTHS && months <= MAX_MONTHS,
