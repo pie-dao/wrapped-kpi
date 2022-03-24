@@ -70,7 +70,7 @@ contract wLSPair is ERC20, Ownable {
     /// @param months amount of months the DOUGH will be staked
     function settleAndStake(uint256 amount, uint8 months) external {
         require(
-            months >= MIN_MONTHS && months <= MAX_MONTHS,
+            months >= 6 && months <= 36,
             "Invalid months to stake"
         );
 
